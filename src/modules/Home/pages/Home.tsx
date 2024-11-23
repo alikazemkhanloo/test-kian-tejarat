@@ -1,7 +1,12 @@
 import { Item } from "@/api/types";
 import { useInfinitItems } from "@/api/useItems";
 import { useMemo } from "react";
+import { ProductItem } from "../components/ProductItem";
+import { Header } from "../components/Header";
+import { headerHeight } from "@/constants";
+
 type GroupedData = { date: string; data: Item[] };
+
 export const Home = () => {
   const { data, isLoading, hasNextPage, fetchNextPage, isFetchingNextPage } =
     useInfinitItems();
@@ -20,30 +25,25 @@ export const Home = () => {
         }
       })
     );
-    return result
+    return result;
   }, [data]);
-  
+
   return (
-    <div>
-      {groupedData?.map((group) => {
-        return (
-          <div>
-            <div className="sticky top-0 bg-black">{group.date}</div>
-            {group.data.map((item) => {
-              return (
-                <div>
-                  {item.title}
-                  <img
-                    src={item.images?.[0]}
-                    className="w-full h-60 object-cover"
-                  />
-                </div>
-              );
-            })}
-          </div>
-        );
-      })}
-      <button onClick={() => fetchNextPage()}>load more</button>
+    <div >
+      <Header />
+      <div style={{ paddingTop: headerHeight }}>
+        {groupedData?.map((group) => {
+          return (
+            <div>
+              <div style={{top: headerHeight}} className="sticky bg-black">{group.date}</div>
+              {group.data.map((item) => {
+                return <ProductItem item={item} />;
+              })}
+            </div>
+          );
+        })}
+        <button onClick={() => fetchNextPage()}>load more</button>
+      </div>
     </div>
   );
 };

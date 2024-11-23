@@ -1,6 +1,6 @@
 import { QueryFunction, useInfiniteQuery } from "@tanstack/react-query";
 import { axios_client } from "./axiosClient";
-import { per_page } from "@/constants";
+import { perPage } from "@/constants";
 import fakeData from "./fakeData.json";
 import { Item } from "./types";
 
@@ -8,7 +8,7 @@ import { Item } from "./types";
 const fetchItems: QueryFunction<Item[], string[], number> = async ({
   pageParam,
 }) => {
-  return fakeData.slice(pageParam * per_page, (pageParam + 1) * per_page);
+  return fakeData.slice(pageParam * perPage, (pageParam + 1) * perPage);
 };
 export const useInfinitItems = () =>
   useInfiniteQuery({
