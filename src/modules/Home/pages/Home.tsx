@@ -1,15 +1,19 @@
 import { Item } from "@/api/types";
-import { useInfinitItems } from "@/api/useItems";
-import { useMemo } from "react";
+import { useGetInfinitItems } from "@/api/useGetItems";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { ProductItem } from "../components/ProductItem";
 import { Header } from "../components/Header";
 import { headerHeight } from "@/constants";
+import { NextPage } from "next";
 
 type GroupedData = { date: string; data: Item[] };
 
-export const Home = () => {
+export const Home: NextPage = () => {
   const { data, isLoading, hasNextPage, fetchNextPage, isFetchingNextPage } =
-    useInfinitItems();
+    useGetInfinitItems();
+
+  const loadingRef = useRef<HTMLDivElement>(null);
+  const [isMounted, setIsMounted] = useState(false);
 
   const groupedData = useMemo(() => {
     const result: GroupedData[] = [];
@@ -28,21 +32,44 @@ export const Home = () => {
     return result;
   }, [data]);
 
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
+  useEffect(() => {
+    if (isMounted) {
+      const observerCallback: IntersectionObserverCallback = (entries) => {
+        const isIntersecting = entries[0]?.isIntersecting;
+        if (isIntersecting) {
+          fetchNextPage();
+        }
+      };
+      const observer = new IntersectionObserver(observerCallback, {
+        rootMargin: "100px 0px 0px 0px",
+        threshold: 0,
+      });
+      observer.observe(loadingRef.current!);
+    }
+  }, [isMounted]);
+
   return (
-    <div >
+    <div>
       <Header />
       <div style={{ paddingTop: headerHeight }}>
         {groupedData?.map((group) => {
           return (
             <div>
-              <div style={{top: headerHeight}} className="sticky bg-black">{group.date}</div>
+              <div style={{ top: headerHeight }} className="sticky bg-black">
+                {group.date}
+              </div>
               {group.data.map((item) => {
                 return <ProductItem item={item} />;
               })}
             </div>
           );
         })}
-        <button onClick={() => fetchNextPage()}>load more</button>
+        {/* hasNextPage in this example will always be true because of not using a proper mock api */}
+        {hasNextPage && <div ref={loadingRef}>loading ...</div>}
       </div>
     </div>
   );

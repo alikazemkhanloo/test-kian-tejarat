@@ -10,7 +10,9 @@ const fetchItems: QueryFunction<Item[], string[], number> = async ({
 }) => {
   return fakeData.slice(pageParam * perPage, (pageParam + 1) * perPage);
 };
-export const useInfinitItems = () =>
+
+
+export const useGetInfinitItems = () =>
   useInfiniteQuery({
     queryKey: ["items-list"],
     queryFn: fetchItems,
